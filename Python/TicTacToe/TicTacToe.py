@@ -1,15 +1,14 @@
 from past.builtins import raw_input
-# http://inventwithpython.com/chapter10.html
-# we only do changes in playing board now
+
+user = True  # when true it refers to x, otherwise o
+cells_left = 9  # if turns_left == 0 and no one is a winner then its a draw!
+
+# we only have to do the changes in playing board
 playing_board = [
     [' ', ' ', ' '],
     [' ', ' ', ' '],
     [' ', ' ', ' ']
 ]
-
-user = True  # when true it refers to x, otherwise o
-# to check the draw condition
-total_turns = 0
 
 
 def print_board():
@@ -27,7 +26,7 @@ def print_board():
 
 
 def isnum(user_input):
-    # checking if it is no. or not if not then user input the value until it it not a no.
+    # checking if it is no. or not, if not then user hav to input the value until it it not a no.
     if not user_input.isnumeric():
         print("This is not a valid no.")
         return False
@@ -36,7 +35,7 @@ def isnum(user_input):
 
 
 def inrange(user_input):
-    #     we already check the no condition in isnum() so we know its a int type
+    # we already check the no condition in isnum() so we know its a int type
     # now we can cast it into integer
     usr_input = int(user_input)
     if usr_input > 9 or usr_input < 1:
@@ -56,29 +55,13 @@ def check_input(user_input):
     return True
 
 
-# board = [
-#       0   1   2   3   4
-#    0 [1, '|', 2, '|', 3],
-#    1 ['-', '+', '-', '+', '-'],
-#    2 [4, '|', 5, '|', 6],
-#    3 ['-', '+', '-', '+', '-'],
-#    4 [7, '|', 8, '|', 9]
-# ]
-
-# we have to focus on this only now
-# [
-#       0  2  4
-#    0 [1, 2, 3],
-#    2 [4, 5, 6],
-#    4 [7, 8, 9]
-# ]
-# check the input position is already taken or not in the board
 def playthemove(coordinates, player):
     row = coordinates[0]
     col = coordinates[1]
     playing_board[row][col] = player
 
 
+# check the input position is already taken or not in the board
 def istaken(cordinates, player):
     row = cordinates[0]
     col = cordinates[1]
@@ -95,10 +78,10 @@ def coordinates(pos):
     col = pos
     if col > 2:
         col = int(col % 3)
-    return (row, col)
+    return row, col
 
 
-def current_player(user):
+def current_player(user):  # it keeps track of who is going to play next
     if user:
         return "x"
     else:
@@ -129,9 +112,11 @@ def check_col(player):
     return False
 
 
-def check_diagnol(player):
+def check_diagonal(player):
+    # left diagonal
     if playing_board[0][0] == player and playing_board[1][1] == player and playing_board[2][2] == player:
         return True
+    # right diagonal
     elif playing_board[0][2] == player and playing_board[1][1] == player and playing_board[2][0] == player:
         return True
     else:
@@ -139,13 +124,13 @@ def check_diagnol(player):
 
 
 def check_winner(player):
-    if check_row(player) or check_col(player) or check_diagnol(player):
+    if check_row(player) or check_col(player) or check_diagonal(player):
         print(f"{player.capitalize()} wins!!")
         return True
     return False
 
 
-while total_turns < 9:
+while cells_left != 0:
     player = current_player(user)
     print_board()
     user_input = raw_input("Enter a no from 1 to 9: ")
@@ -162,8 +147,8 @@ while total_turns < 9:
     if check_winner(player):
         print_board()
         break
-    total_turns += 1
+    cells_left -= 1  # after every move minus 1 cell from turns_left
 
-    if total_turns == 9:
-        print("its a Draw!")
+    if cells_left == 0:
+        print("its a Draw!")  # if no cell left then its a draw
     user = not user
